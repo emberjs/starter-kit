@@ -1545,6 +1545,8 @@ window.sc_assert = function sc_assert(desc, test) {
 /*globals sc_assert */
 
 /**
+  @class
+
   Platform specific methods and feature detectors needed by the framework.
 */
 SC.platform = {} ;
@@ -1641,6 +1643,7 @@ var o_defineProperty = SC.platform.defineProperty;
 var o_create = SC.platform.create;
 
 /**
+  @private
   @static
   @type String
   @constant
@@ -1655,6 +1658,8 @@ var o_create = SC.platform.create;
 SC.GUID_KEY = GUID_KEY;
 
 /**
+  @private
+
   Generates a new guid, optionally saving the guid to the object that you
   pass in.  You will rarely need to use this method.  Instead you should
   call SC.guidFor(obj), which return an existing guid if available.
@@ -1676,15 +1681,15 @@ SC.generateGuid = function(obj, prefix) {
   if (!prefix) prefix = 'sc';
   var ret = (prefix + (uuid++));
   if (obj) {
-    GUID_DESC.value = ret;
-    o_defineProperty(obj, GUID_KEY, GUID_DESC);
-    GUID_DESC.value = null;
+    obj[GUID_KEY] = ret;
   }
 
   return ret ;
 };
 
 /**
+  @private
+
   Returns a unique id for the object.  If the object does not yet have
   a guid, one will be assigned to it.  You can call this on any object,
   SC.Object-based or not, but be aware that it will add a _guid property.
@@ -1758,6 +1763,7 @@ var EMPTY_META = {
 if (Object.freeze) Object.freeze(EMPTY_META);
 
 /**
+  @private
   @function
   
   Retrieves the meta hash for an object.  If 'writable' is true ensures the
@@ -1808,6 +1814,8 @@ SC.meta = function meta(obj, writable) {
 };
 
 /**
+  @private
+
   Wraps the passed function so that `this._super` will point to the superFunc
   when the function is invoked.  This is the primitive we use to implement
   calls to super.
@@ -2098,16 +2106,19 @@ function normalizeTuple(target, path) {
 }
 
 /**
-  Normalizes a path to support older-style property paths beginning with . or
-  *
+  @private
 
-  @method
+  Normalizes a path to support older-style property paths beginning with . or
+
+  @function
   @param {String} path path to normalize
   @returns {String} normalized path  
 */
 SC.normalizePath = normalizePath;
 
 /**
+  @private
+
   Normalizes a target/path pair to reflect that actual target/path that should
   be observed, etc.  This takes into account passing in global property 
   paths (i.e. a path beginning with a captial letter not defined on the 
@@ -2220,6 +2231,7 @@ var SIMPLE_DESC = {
 };
 
 /**
+  @private
   @constructor
   
   Objects of this type can implement an interface to responds requests to
@@ -2456,6 +2468,8 @@ function hasDesc(descs, keyName) {
 }
 
 /**
+  @private
+
   NOTE: This is a low-level method used by other parts of the API.  You almost
   never want to call this method directly.  Instead you should use SC.mixin()
   to define new properties.
@@ -2537,6 +2551,8 @@ SC.create = function(obj, props) {
 };
 
 /**
+  @private
+
   Creates a new object using the passed object as its prototype.  This method
   acts like `SC.create()` in every way except that bindings, observers, and
   computed properties will be activated on the object.  
@@ -3120,6 +3136,7 @@ SC.addObserver = function(obj, path, target, method) {
   return this;
 };
 
+/** @private */
 SC.observersFor = function(obj, path) {
   return SC.listenersFor(obj, changeEvent(path));
 };
@@ -3138,6 +3155,7 @@ SC.addBeforeObserver = function(obj, path, target, method) {
   return this;
 };
 
+/** @private */
 SC.beforeObserversFor = function(obj, path) {
   return SC.listenersFor(obj, beforeEvent(path));
 };
@@ -3149,11 +3167,12 @@ SC.removeBeforeObserver = function(obj, path, target, method) {
   return this;
 };
 
-
+/** @private */
 SC.notifyObservers = function(obj, keyName) {
   notifyObservers(obj, changeEvent(keyName));
 };
 
+/** @private */
 SC.notifyBeforeObservers = function(obj, keyName) {
   notifyObservers(obj, beforeEvent(keyName));
 };
@@ -3520,6 +3539,8 @@ function chainsDidChange(obj, keyName) {
 var WATCHED_PROPERTY = SC.SIMPLE_PROPERTY.watched;
 
 /**
+  @private
+
   Starts watching a property on an object.  Whenever the property changes,
   invokes SC.propertyWillChange and SC.propertyDidChange.  This is the 
   primitive used by observers and dependent keys; usually you will never call
@@ -3553,6 +3574,7 @@ SC.watch = function(obj, keyName) {
 
 SC.watch.flushPending = flushPendingChains;
 
+/** @private */
 SC.unwatch = function(obj, keyName) {
   // can't watch length on Array - it is special...
   if (keyName === 'length' && SC.typeOf(obj)==='array') return this;
@@ -3577,6 +3599,8 @@ SC.unwatch = function(obj, keyName) {
 };
 
 /**
+  @private
+
   Call on an object when you first beget it from another object.  This will
   setup any chained watchers on the object instance as needed.  This method is
   safe to call multiple times.
@@ -4516,6 +4540,7 @@ SC.ORDER_DEFINITION = SC.ENV.ORDER_DEFINITION || [
   when inspecting objects for debugging.  On browsers that support it, this
   uses the native Object.keys implementation.
 
+  @function
   @param {Object} obj
   @returns {Array} Array containing keys of obj
 */
@@ -4536,6 +4561,7 @@ if (!SC.keys) {
   Empty function.  Useful for some operations.
 
   @returns {Object}
+  @private
 */
 SC.K = function() { return this; };
 
@@ -4966,7 +4992,7 @@ function xform(target, method, params) {
 }
 
 /**
-  @namespace
+  @class
 
   This mixin defines the common interface implemented by enumerable objects
   in SproutCore.  Most of these methods follow the standard Array iteration
@@ -5002,7 +5028,7 @@ function xform(target, method, params) {
 
   @since SproutCore 1.0
 */
-SC.Enumerable = SC.Mixin.create({
+SC.Enumerable = SC.Mixin.create( /** @lends SC.Enumerable */ {
   
   /** @private - compatibility */
   isEnumerable: true,
@@ -6231,6 +6257,8 @@ SC.FROZEN_ERROR = "Frozen object cannot be modified.";
 // ==========================================================================
 
 /**
+  @class
+
   This mixin defines the API for modifying generic enumerables.  These methods
   can be applied to an object regardless of whether it is ordered or 
   unordered.
@@ -6359,6 +6387,8 @@ var EMPTY = [];
 var get = SC.get, set = SC.set;
 
 /**
+  @class
+
   This mixin defines the API for modifying array-like objects.  These methods
   can be applied only to a collection that keeps its items in an ordered set.
   
@@ -6554,6 +6584,8 @@ SC.MutableArray = SC.Mixin.create(SC.Array, SC.MutableEnumerable,
 var get = SC.get, set = SC.set;
   
 /**
+  @class
+
   Restores some of the SC 1.x SC.Observable mixin API.  The new property 
   observing system does not require SC.Observable to be applied anymore.
   Instead, on most browsers you can just access properties directly.  For
@@ -7466,6 +7498,7 @@ SC.Object = SC.CoreObject.extend(SC.Observable);
 // ==========================================================================
 
 /**
+  @private
   A Namespace is an object usually used to contain other objects or methods 
   such as an application or framework.  Create a namespace anytime you want
   to define one of these new containers.
@@ -7490,6 +7523,8 @@ SC.Namespace = SC.Object.extend();
 // ==========================================================================
 
 /**
+  @private
+
   Defines a namespace that will contain an executable application.  This is
   very similar to a normal namespace except that it is expected to include at
   least a 'main' function which can be run to initialize the application.
@@ -7527,6 +7562,8 @@ SC.Application = SC.Namespace.extend();
 var get = SC.get, set = SC.set;
 
 /**
+  @class
+
   An ArrayProxy wraps any other object that implements SC.Array and/or 
   SC.MutableArray, forwarding all requests.  ArrayProxy isn't useful by itself
   but you can extend it to do specialized things like transforming values,
@@ -7794,7 +7831,8 @@ var run;
   you are implementing raw event handlers when interfacing with other 
   libraries or plugins, you should probably wrap all of your code inside this
   call.
-  
+
+  @function
   @param {Object} target
     (Optional) target of method to call
     
@@ -8975,6 +9013,9 @@ function removeObserverForContentKey(content, keyName, proxy, idx, loc) {
 }
 
 /**
+  @private
+  @class
+
   This is the object instance returned when you get the @each property on an
   array.  It uses the unknownProperty handler to automatically create 
   EachArray instances for property names.
@@ -11113,9 +11154,9 @@ SC.TextField = SC.View.extend(
   insertNewline: SC.K,
   cancel: SC.K,
 
-  type: 'text',
-  value: '',
-  placeholder: '',
+  type: "text",
+  value: "",
+  placeholder: null,
 
   defaultTemplate: function() {
     var type = get(this, 'type');
@@ -11160,12 +11201,7 @@ SC.TextField = SC.View.extend(
 
   _updateElementValue: function() {
     var input = this.$('input');
-    var value = get(this, 'value');
-
-    if (value === undefined || value === null) {
-      value = '';
-    }
-    input.val(value);
+    input.val(get(this, 'value'));
   }
 });
 
@@ -11598,10 +11634,7 @@ Handlebars.registerHelper('bindAttr', function(options) {
         elem.attr(attr, attr);
 
       } else {
-        // Since attr() doesn't support non-string values in jQuery 1.6, coerce
-        // to a string first.
-        if (SC.none(result)) { result = ''; }
-        elem.attr(attr, result.toString());
+        elem.attr(attr, result);
       }
     };
 
