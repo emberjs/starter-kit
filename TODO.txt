@@ -18,7 +18,12 @@ Your SproutCore project is almost ready! Here's how to get started:
 
 - Change the favicons
 
-- Remove the jQuery test in index.html and script.js, and the link to this TODO list.
+- Start writing your app in js/app.js.
+
+- Describe your application HTML in index.html.
+
+- During development, you can link to sproutcore-2.0.a.1.js to get the
+  unminified version of SproutCore.
 
 - Make a 404.html page if you have a 404 redirection in your server configuration file
 
@@ -27,15 +32,6 @@ Your SproutCore project is almost ready! Here's how to get started:
 - Use CSS versioning to force the cache refresh:
   <link rel="stylesheet" href="css/style.css?v=[current_version]">
 
-- To fix the PNG background image of an element in IE6, add the .png_bg class to this element.
-
-- To apply a particular style to an element in a specific version of Internet Explorer,
-use the .ie6, .ie7, .ie8 and .ie9 in the CSS selector for this element:
-
-.ie6 #myelement{
-  margin-left: 20px;
-}
-
 == About =========================
 
 This SproutCore package is based on a build of HTML 5 Boilerplate from
@@ -43,3 +39,4 @@ initializr.com. Thanks @jverrecchia!
 
 == Contact =======================
 
+www.sproutcore.com
