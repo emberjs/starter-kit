@@ -1626,7 +1626,7 @@ if (!SC.platform.defineProperty) {
 // 
 
 // Used for guid generation...
-var GUID_KEY = '__sc'+Date.now();
+var GUID_KEY = '__sc'+ (+ new Date());
 var uuid, numberCache, stringCache;
 
 uuid         = 0;
@@ -1681,7 +1681,15 @@ SC.generateGuid = function(obj, prefix) {
   if (!prefix) prefix = 'sc';
   var ret = (prefix + (uuid++));
   if (obj) {
-    obj[GUID_KEY] = ret;
+    GUID_DESC.value = ret;
+    // In Safari 5.0.5, calling Object.defineProperty on a DOM element
+    // causes an error to be thrown. In that case, just set directly.
+    try {
+      o_defineProperty(obj, GUID_KEY, GUID_DESC);
+    } catch (e) {
+      obj[GUID_KEY] = ret;
+    }
+    GUID_DESC.value = null;
   }
 
   return ret ;
@@ -3705,6 +3713,8 @@ var a_map = Array.prototype.map;
 var EMPTY_META = {}; // dummy for non-writable meta
 var META_SKIP = { __scproto__: true, __sc_count__: true };
 
+var o_create = SC.platform.create;
+
 function meta(obj, writable) {
   var m = SC.meta(obj, writable!==false), ret = m.mixins;
   if (writable===false) return ret || EMPTY_META;
@@ -3712,7 +3722,7 @@ function meta(obj, writable) {
   if (!ret) {
     ret = m.mixins = { __scproto__: obj };
   } else if (ret.__scproto__ !== obj) {
-    ret = m.mixins = Object.create(ret);
+    ret = m.mixins = o_create(ret);
     ret.__scproto__ = obj;
   }
   return ret;
@@ -3814,7 +3824,7 @@ var defineProperty = SC.defineProperty;
 function writableReq(obj) {
   var m = SC.meta(obj), req = m.required;
   if (!req || (req.__scproto__ !== obj)) {
-    req = m.required = req ? Object.create(req) : { __sc_count__: 0 };
+    req = m.required = req ? o_create(req) : { __sc_count__: 0 };
     req.__scproto__ = obj;
   }
   return req;
@@ -7965,7 +7975,7 @@ var timers = {}; // active timers...
 
 var laterScheduled = false;
 function invokeLaterTimers() {
-  var now = Date.now(), earliest = -1;
+  var now = (+ new Date()), earliest = -1;
   for(var key in timers) {
     if (!timers.hasOwnProperty(key)) continue;
     var timer = timers[key];
@@ -7980,7 +7990,7 @@ function invokeLaterTimers() {
   }
   
   // schedule next timeout to fire...
-  if (earliest>0) setTimeout(invokeLaterTimers, earliest-Date.now()); 
+  if (earliest>0) setTimeout(invokeLaterTimers, earliest-(+ new Date())); 
 }
 
 /**
@@ -8023,7 +8033,7 @@ SC.run.later = function(target, method) {
     wait = args.pop();
   }
   
-  expires = Date.now()+wait;
+  expires = (+ new Date())+wait;
   timer   = { target: target, method: method, expires: expires, args: args };
   guid    = SC.guidFor(timer);
   timers[guid] = timer;
