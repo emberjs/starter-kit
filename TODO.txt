@@ -1,13 +1,13 @@
- _____                            _    _____
-/  ___|                          | |  /  __ \
-\ `--.  _ __   _ __  ___   _   _ | |_ | /  \/  ___   _ __  ___
- `--. \| '_ \ | '__|/ _ \ | | | || __|| |     / _ \ | '__|/ _ \
-/\__/ /| |_) || |  | (_) || |_| || |_ | \__/\| (_) || |  |  __/
-\____/ | .__/ |_|   \___/  \__,_| \__| \____/ \___/ |_|   \___|
-       | |
-       |_|
+  ______           _              _     
+ |  ____|         | |            (_)    
+ | |__   _ __ ___ | |__   ___ _ ___ ___ 
+ |  __| | '_ ` _ \| '_ \ / _ \ '__| / __|
+ | |____| | | | | | |_) |  __/ |_| \__ \
+ |______|_| |_| |_|_.__/ \___|_(_) |___/
+                                _/ |    
+                               |__/
 
-Your SproutCore project is almost ready! Here's how to get started:
+Your Ember.js project is almost ready! Here's how to get started:
 
 - Change lang="en" in the <html> tag if your page is not in English
 
@@ -22,8 +22,8 @@ Your SproutCore project is almost ready! Here's how to get started:
 
 - Describe your application HTML in index.html.
 
-- During development, you can link to sproutcore-2.0.a.1.js to get the
-  unminified version of SproutCore.
+- During development, you can link to ember-*.js to get the
+  unminified version of Ember.js.
 
 - Make a 404.html page if you have a 404 redirection in your server configuration file
 
@@ -34,9 +34,9 @@ Your SproutCore project is almost ready! Here's how to get started:
 
 == About =========================
 
-This SproutCore package is based on a build of HTML 5 Boilerplate from
+This Ember.js package is based on a build of HTML 5 Boilerplate from
 initializr.com. Thanks @jverrecchia!
 
 == Contact =======================
 
-www.sproutcore.com
+www.emberjs.com
