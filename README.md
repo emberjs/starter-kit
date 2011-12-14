@@ -1,3 +1,3 @@
 *Don't clone this repo, download instead!*
 
-[https://github.com/amberjs/starter-kit/downloads]
+[https://github.com/emberjs/starter-kit/downloads]
