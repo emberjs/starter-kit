@@ -1608,7 +1608,7 @@ if ('undefined' === typeof Ember) {
 /**
   @namespace
   @name Ember
-  @version 0.9.2
+  @version 0.9.3
 
   All Ember methods and functions are defined inside of this namespace.
   You generally should not add new properties to this namespace as it may be
@@ -1640,10 +1640,10 @@ if ('undefined' !== typeof window) {
 /**
   @static
   @type String
-  @default '0.9.2'
+  @default '0.9.3'
   @constant
 */
-Ember.VERSION = '0.9.2';
+Ember.VERSION = '0.9.3';
 
 /**
   @static
@@ -12124,8 +12124,8 @@ Ember.View.states.preRender = {
   // a view leaves the preRender state once its element has been
   // created (createElement).
   insertElement: function(view, fn) {
-    view._notifyWillInsertElement(true);
     view.createElement();
+    view._notifyWillInsertElement(true);
     // after createElement, the view will be in the hasElement state.
     fn.call(view);
     view.transitionTo('inDOM');
@@ -13378,14 +13378,13 @@ Ember.ViewState = Ember.State.extend({
       var nextSibling;
       var node;
 
-      debugger;
       node = firstNodeFor(parentNode, html);
       var insertBefore = start.nextSibling;
 
       while (node) {
         nextSibling = node.nextSibling;
         parentNode.insertBefore(node, insertBefore);
-        node = nextSibling
+        node = nextSibling;
       }
     }
   }
@@ -13796,6 +13795,48 @@ Ember.TextArea = Ember.View.extend(Ember.TextSupport, {
 
 });
 
+})({});
+
+
+(function(exports) {
+Ember.TabContainerView = Ember.View.extend();
+
+})({});
+
+
+(function(exports) {
+var get = Ember.get, getPath = Ember.getPath;
+
+Ember.TabPaneView = Ember.View.extend({
+  tabsContainer: SC.computed(function() {
+    return this.nearestInstanceOf(Ember.TabContainerView);
+  }).property(),
+
+  isVisible: SC.computed(function() {
+    return get(this, 'viewName') === getPath(this, 'tabsContainer.currentView');
+  }).property('tabsContainer.currentView')
+});
+
+})({});
+
+
+(function(exports) {
+var get = Ember.get, setPath = Ember.setPath;
+
+Ember.TabView = Ember.View.extend({
+  tabsContainer: SC.computed(function() {
+    return this.nearestInstanceOf(Ember.TabContainerView);
+  }).property(),
+
+  mouseUp: function() {
+    setPath(this, 'tabsContainer.currentView', get(this, 'value'));
+  }
+});
+
+})({});
+
+
+(function(exports) {
 })({});
 
 
@@ -14263,7 +14304,7 @@ Ember.Handlebars.registerHelper('bindAttr', function(options) {
 
       ember_assert(fmt("Attributes must be numbers, strings or booleans, not %@", [result]), result == null || typeof result === 'number' || typeof result === 'string' || typeof result === 'boolean');
 
-      var elem = view.$("[data-handlebars-id='" + dataId + "']");
+      var elem = view.$("[data-bindAttr-" + dataId + "='" + dataId + "']");
 
       // If we aren't able to find the element, it means the element
       // to which we were bound has been removed from the view.
@@ -14312,7 +14353,7 @@ Ember.Handlebars.registerHelper('bindAttr', function(options) {
   }, this);
 
   // Add the unique identifier
-  ret.push('data-handlebars-id="' + dataId + '"');
+  ret.push('data-bindAttr-' + dataId + '="' + dataId + '"');
   return new Ember.Handlebars.SafeString(ret.join(' '));
 });
 
@@ -14337,12 +14378,12 @@ Ember.Handlebars.registerHelper('bindAttr', function(options) {
   @param {Ember.View} view
     The view in which observers should look for the element to update
 
-  @param {String} id 
-    Optional id use to lookup elements
+  @param {Srting} bindAttrId
+    Optional bindAttr id used to lookup elements
 
   @returns {Array} An array of class names to add
 */
-Ember.Handlebars.bindClasses = function(context, classBindings, view, id) {
+Ember.Handlebars.bindClasses = function(context, classBindings, view, bindAttrId) {
   var ret = [], newClass, value, elem;
 
   // Helper method to retrieve the property from the context and
@@ -14394,7 +14435,7 @@ Ember.Handlebars.bindClasses = function(context, classBindings, view, id) {
     observer = function() {
       // Get the current value of the property
       newClass = classStringForProperty(binding);
-      elem = id ? view.$("[data-handlebars-id='" + id + "']") : view.$();
+      elem = bindAttrId ? view.$("[data-bindAttr-" + bindAttrId + "='" + bindAttrId + "']") : view.$();
 
       // If we can't find the element anymore, a parent template has been
       // re-rendered and we've been nuked. Remove the observer.
