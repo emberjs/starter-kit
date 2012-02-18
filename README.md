@@ -1,3 +1,1 @@
-*Don't clone this repo, download instead!*
-
-[https://github.com/emberjs/starter-kit/downloads]
+Download the ZIP to get started with Ember.js: [https://github.com/emberjs/starter-kit/downloads]
