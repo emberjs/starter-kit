@@ -1737,7 +1737,7 @@ if ('undefined' === typeof Ember) {
 /**
   @namespace
   @name Ember
-  @version 0.9.6
+  @version 0.9.7
 
   All Ember methods and functions are defined inside of this namespace.
   You generally should not add new properties to this namespace as it may be
@@ -1769,10 +1769,10 @@ if ('undefined' !== typeof window) {
 /**
   @static
   @type String
-  @default '0.9.6'
+  @default '0.9.7'
   @constant
 */
-Ember.VERSION = '0.9.6';
+Ember.VERSION = '0.9.7';
 
 /**
   @static
@@ -2337,7 +2337,6 @@ Ember.wrap = function(func, superFunc) {
       Ember.isArray([]); // true
       Ember.isArray( Ember.ArrayProxy.create({ content: [] }) ); // true
 
-  @name Ember.isArray
   @param {Object} obj The object to test
   @returns {Boolean}
 */
@@ -3258,7 +3257,7 @@ function addDependentKeys(desc, obj, keyName) {
 /** @private */
 function ComputedProperty(func, opts) {
   this.func = func;
-  this._cacheable = !opts || opts.cacheable !== false;
+  this._cacheable = opts && opts.cacheable;
   this._dependentKeys = opts && opts.dependentKeys;
 }
 
@@ -7924,7 +7923,7 @@ Ember.Enumerable = Ember.Mixin.create( /** @lends Ember.Enumerable */ {
     ret = this.nextObject(0, null, context);
     pushCtx(context);
     return ret ;
-  }).property().cacheable(false),
+  }).property(),
 
   /**
     Helper method returns the last object from a collection. If your enumerable
@@ -7953,7 +7952,7 @@ Ember.Enumerable = Ember.Mixin.create( /** @lends Ember.Enumerable */ {
       pushCtx(context);
       return last;
     }
-  }).property().cacheable(false),
+  }).property(),
 
   /**
     Returns true if the passed object can be found in the receiver.  The
@@ -12708,13 +12707,13 @@ Ember.View = Ember.Object.extend(Ember.Evented,
     } else {
       return parent;
     }
-  }).property('_parentView').cacheable(false),
+  }).property('_parentView'),
 
   // return the current view, not including virtual views
   concreteView: Ember.computed(function() {
     if (!this.isVirtual) { return this; }
     else { return get(this, 'parentView'); }
-  }).property('_parentView').cacheable(false),
+  }).property('_parentView'),
 
   /**
     If false, the view will appear hidden in DOM.
@@ -14392,8 +14391,7 @@ var childViewsProperty = Ember.computed(function() {
 
 /**
   @class
-  @extends Ember.View
-  
+
   A `ContainerView` is an `Ember.View` subclass that allows for manual or programatic
   management of a view's `childViews` array that will correctly update the `ContainerView`
   instance's rendered DOM representation.
@@ -14559,6 +14557,8 @@ var childViewsProperty = Ember.computed(function() {
   property on a container view will not result in the template or layout being rendered. 
   The HTML contents of a `Ember.ContainerView`'s DOM representation will only be the rendered HTML
   of its child views.
+
+  @extends Ember.View
 */
 
 Ember.ContainerView = Ember.View.extend({
@@ -14778,9 +14778,7 @@ var get = Ember.get, set = Ember.set, fmt = Ember.String.fmt;
 
 /**
   @class
-  @since Ember 0.9
-  @extends Ember.ContainerView
-  
+
   `Ember.CollectionView` is an `Ember.View` descendent responsible for managing a
   collection (an array or array-like object) by maintaing a child view object and 
   associated DOM representation for each item in the array and ensuring that child
@@ -14887,7 +14885,9 @@ var get = Ember.get, set = Ember.set, fmt = Ember.String.fmt;
   ## Use in templates via the `{{collection}}` Ember.Handlebars helper
   Ember.Handlebars provides a helper specifically for adding `CollectionView`s to templates.
   See `Ember.Handlebars.collection` for more details
-  
+
+  @since Ember 0.9
+  @extends Ember.ContainerView
 */
 Ember.CollectionView = Ember.ContainerView.extend(
 /** @scope Ember.CollectionView.prototype */ {
@@ -16621,7 +16621,7 @@ var normalizePath = Ember.Handlebars.normalizePath = function(root, path, data) 
 */
 
 Ember.Handlebars.getPath = function(root, path, options) {
-  var data = options.data,
+  var data = options && options.data,
       normalizedPath = normalizePath(root, path, data),
       value;
 
@@ -16845,7 +16845,7 @@ Ember._BindableSpanView = Ember.View.extend(Ember.Metamorph,
     }
 
     return valueNormalizer ? valueNormalizer(result) : result;
-  }).property('property', 'previousContext', 'valueNormalizerFunc').cacheable(false),
+  }).property('property', 'previousContext', 'valueNormalizerFunc'),
 
   rerenderIfNeeded: function() {
     if (!get(this, 'isDestroyed') && get(this, 'normalizedValue') !== this._lastNormalizedValue) {
@@ -17837,9 +17837,33 @@ var EmberHandlebars = Ember.Handlebars, getPath = EmberHandlebars.getPath;
 var ActionHelper = EmberHandlebars.ActionHelper = {
   registeredActions: {}
 };
+
+ActionHelper.registerAction = function(actionName, eventName, target, view, context) {
+  var actionId = (++Ember.$.uuid).toString();
+
+  ActionHelper.registeredActions[actionId] = {
+    eventName: eventName,
+    handler: function(event) {
+      event.view = view;
+      event.context = context;
+
+      // Check for StateManager (or compatible object)
+      if (target.isState && typeof target.send === 'function') {
+        return target.send(actionName, event);
+      } else {
+        return target[actionName].call(target, event);
+      }
+    }
+  };
+
+  view.on('willRerender', function() {
+    delete ActionHelper.registeredActions[actionId];
+  });
+
+  return actionId;
+};
+
 /**
-  @name Handlebars.helpers.action
-  
   The `{{action}}` helper registers an HTML element within a template for
   DOM event handling.  User interaction with that element will call the method
   on the template's associated `Ember.View` instance that has the same name
@@ -17947,33 +17971,11 @@ var ActionHelper = EmberHandlebars.ActionHelper = {
   an `Ember.EventDispatcher` instance is available. An `Ember.EventDispatcher` instance 
   will be created when a new `Ember.Application` is created. Having an instance of
   `Ember.Application` will satisfy this requirement.
-  
+
+  @name Handlebars.helpers.action
+  @param {String} actionName
+  @param {Hash} options
 */
-ActionHelper.registerAction = function(actionName, eventName, target, view, context) {
-  var actionId = (++Ember.$.uuid).toString();
-
-  ActionHelper.registeredActions[actionId] = {
-    eventName: eventName,
-    handler: function(event) {
-      event.view = view;
-      event.context = context;
-
-      // Check for StateManager (or compatible object)
-      if (target.isState && typeof target.send === 'function') {
-        return target.send(actionName, event);
-      } else {
-        return target[actionName].call(target, event);
-      }
-    }
-  };
-
-  view.on('willRerender', function() {
-    delete ActionHelper.registeredActions[actionId];
-  });
-
-  return actionId;
-};
-
 EmberHandlebars.registerHelper('action', function(actionName, options) {
   var hash = options.hash || {},
       eventName = hash.on || "click",
@@ -17996,14 +17998,13 @@ EmberHandlebars.registerHelper('action', function(actionName, options) {
 var get = Ember.get, set = Ember.set;
 
 /**
-  @name Handlebars.helpers.yield
-  
+
   When used in a Handlebars template that is assigned to an `Ember.View` instance's
   `layout` property Ember will render the layout template first, inserting the view's
   own rendered output at the `{{ yield }}` location.
-  
+
   An empty `<body>` and the following application code:
-  
+
         AView = Ember.View.extend({
           classNames: ['a-view-with-layout'],
           layout: Ember.Handlebars.compile('<div class="wrapper">{{ yield }}</div>'),
@@ -18012,9 +18013,9 @@ var get = Ember.get, set = Ember.set;
 
         aView = AView.create()
         aView.appendTo('body')
-        
+
   Will result in the following HTML output:
-  
+
         <body>
           <div class='ember-view a-view-with-layout'>
             <div class="wrapper">
@@ -18022,11 +18023,11 @@ var get = Ember.get, set = Ember.set;
             </div>
           </div>
         </body>
-  
-  
+
+
   The yield helper cannot be used outside of a template assigned to an `Ember.View`'s `layout` property
   and will throw an error if attempted.
-  
+
       BView = Ember.View.extend({
         classNames: ['a-view-with-layout'],
         template: Ember.Handlebars.compile('{{yield}}')
@@ -18034,9 +18035,13 @@ var get = Ember.get, set = Ember.set;
 
       bView = BView.create()
       bView.appendTo('body')
-      
+
       // throws
       // Uncaught Error: assertion failed: You called yield in a template that was not a layout
+
+  @name Handlebars.helpers.yield
+  @param {Hash} options
+  @returns {String} HTML string
 */
 Ember.Handlebars.registerHelper('yield', function(options) {
   var view = options.data.view, template;
@@ -18129,11 +18134,11 @@ Ember.Checkbox = Ember.View.extend({
 
   tagName: Ember.computed(function(){
     return get(this, 'title') ? undefined : 'input';
-  }).property().cacheable(false),
+  }).property(),
 
   attributeBindings: Ember.computed(function(){
     return get(this, 'title') ? [] : ['type', 'checked', 'disabled'];
-  }).property().cacheable(false),
+  }).property(),
 
   type: "checkbox",
   checked: false,
@@ -18159,7 +18164,7 @@ Ember.Checkbox = Ember.View.extend({
     } else {
       return get(this, 'checked');
     }
-  }).property('checked').cacheable(false),
+  }).property('checked'),
 
   change: function() {
     Ember.run.once(this, this._updateElementValue);
@@ -18432,11 +18437,11 @@ var get = Ember.get, getPath = Ember.getPath;
 Ember.TabPaneView = Ember.View.extend({
   tabsContainer: Ember.computed(function() {
     return this.nearestInstanceOf(Ember.TabContainerView);
-  }).property().cacheable(false),
+  }).property(),
 
   isVisible: Ember.computed(function() {
     return get(this, 'viewName') === getPath(this, 'tabsContainer.currentView');
-  }).property('tabsContainer.currentView').cacheable(false)
+  }).property('tabsContainer.currentView')
 });
 
 })();
@@ -18449,7 +18454,7 @@ var get = Ember.get, setPath = Ember.setPath;
 Ember.TabView = Ember.View.extend({
   tabsContainer: Ember.computed(function() {
     return this.nearestInstanceOf(Ember.TabContainerView);
-  }).property().cacheable(false),
+  }).property(),
 
   mouseUp: function() {
     setPath(this, 'tabsContainer.currentView', get(this, 'value'));
@@ -18596,7 +18601,7 @@ Ember.SelectOption = Ember.View.extend({
       // `new Number(4) !== 4`, we use `==` below
       return content == selection;
     }
-  }).property('content', 'parentView.selection').cacheable(false),
+  }).property('content', 'parentView.selection'),
 
   labelPathDidChange: Ember.observer(function() {
     var labelPath = getPath(this, 'parentView.optionLabelPath');
