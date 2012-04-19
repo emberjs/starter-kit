@@ -1737,7 +1737,7 @@ if ('undefined' === typeof Ember) {
 /**
   @namespace
   @name Ember
-  @version 0.9.7
+  @version 0.9.7.1
 
   All Ember methods and functions are defined inside of this namespace.
   You generally should not add new properties to this namespace as it may be
@@ -1769,10 +1769,10 @@ if ('undefined' !== typeof window) {
 /**
   @static
   @type String
-  @default '0.9.7'
+  @default '0.9.7.1'
   @constant
 */
-Ember.VERSION = '0.9.7';
+Ember.VERSION = '0.9.7.1';
 
 /**
   @static
@@ -12129,13 +12129,27 @@ Ember._RenderBuffer.prototype =
   },
 
   _escapeAttribute: function(value) {
-    // Escaping only double quotes is probably sufficient, but it can't hurt to do a few more
-    return value.toString()
-                  .replace(/&/g, '&amp;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;')
-                  .replace(/'/g, '&#x27;')
-                  .replace(/"/g, '&quot;');
+    // Stolen shamelessly from Handlebars
+
+    var escape = {
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#x27;",
+      "`": "&#x60;"
+    };
+
+    var badChars = /&(?!\w+;)|[<>"'`]/g;
+    var possible = /[&<>"'`]/;
+
+    var escapeChar = function(chr) {
+      return escape[chr] || "&amp;";
+    };
+
+    var string = value.toString();
+
+    if(!possible.test(string)) { return string; }
+    return string.replace(badChars, escapeChar);
   }
 
 };
@@ -17153,7 +17167,7 @@ EmberHandlebars.registerHelper('bindAttr', function(options) {
   var classBindings = attrs['class'];
   if (classBindings !== null && classBindings !== undefined) {
     var classResults = EmberHandlebars.bindClasses(this, classBindings, view, dataId, options);
-    ret.push('class="' + classResults.join(' ') + '"');
+    ret.push('class="' + Handlebars.Utils.escapeExpression(classResults.join(' ')) + '"');
     delete attrs['class'];
   }
 
@@ -17207,8 +17221,9 @@ EmberHandlebars.registerHelper('bindAttr', function(options) {
 
     // if this changes, also change the logic in ember-views/lib/views/view.js
     if ((type === 'string' || (type === 'number' && !isNaN(value)))) {
-      ret.push(attr + '="' + value + '"');
+      ret.push(attr + '="' + Handlebars.Utils.escapeExpression(value) + '"');
     } else if (value && type === 'boolean') {
+      // The developer controls the attr name, so it should always be safe
       ret.push(attr + '="' + attr + '"');
     }
   }, this);
