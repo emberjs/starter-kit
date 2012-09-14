@@ -1,7 +1,16 @@
-var App = Em.Application.create();
+var App = Ember.Application.create();
 
-App.MyView = Em.View.extend({
-  mouseDown: function() {
-    window.alert("hello world!");
-  }
+App.ApplicationController = Ember.Controller.extend();
+App.ApplicationView = Ember.View.extend({
+  templateName: 'application'
 });
+
+App.Router = Ember.Router.extend({
+  root: Ember.Route.extend({
+    index: Ember.Route.extend({
+      route: '/'
+    })
+  })
+})
+
+App.initialize();
