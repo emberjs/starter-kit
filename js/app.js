@@ -11,6 +11,6 @@ App.Router = Ember.Router.extend({
       route: '/'
     })
   })
-})
+});
 
 App.initialize();
