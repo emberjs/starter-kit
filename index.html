@@ -3,20 +3,24 @@
 <head>
 <meta charset=utf-8 />
 <title>Ember Starter Kit</title>
-  <script src="js/libs/jquery-1.9.1.js"></script>
-  <script src="js/libs/handlebars-1.0.0-rc.3.js"></script>
-  <script src="js/libs/ember-1.0.0-rc.1.js"></script>
-  <script src="js/app.js"></script>
+  <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
   <script type="text/x-handlebars" data-template-name="index">
-    <h2>Index Content:</h2>
+    <h2>Welcome to Ember.js</h2>
     <ul>
     {{#each item in content}}
         <li>{{item}}</li>
     {{/each}}
      </ul>
   </script>
+
+  <script src="js/libs/jquery-1.9.1.js"></script>
+  <script src="js/libs/handlebars-1.0.0-rc.3.js"></script>
+  <script src="js/libs/ember-1.0.0-rc.1.js"></script>
+  <script src="js/app.js"></script>
+
 </body>
 </html>
