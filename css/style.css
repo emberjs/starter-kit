@@ -1,4 +1,4 @@
 /* Put your CSS here */
-html, body {
+.ember-application {
     margin: 20px;
 }
