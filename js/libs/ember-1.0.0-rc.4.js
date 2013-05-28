@@ -1,5 +1,5 @@
-// Version: v1.0.0-rc4
-// Last commit: ae2e55f (2013-05-27 19:34:11 -0400)
+// Version: v1.0.0-rc.3-272-g4c74b2d
+// Last commit: 4c74b2d (2013-05-21 12:35:21 -0700)
 
 
 (function() {
@@ -151,8 +151,8 @@ Ember.deprecateFunc = function(message, func) {
 
 })();
 
-// Version: v1.0.0-rc4
-// Last commit: ae2e55f (2013-05-27 19:34:11 -0400)
+// Version: v1.0.0-rc.4
+// Last commit: 1acec81 (2013-05-27 20:18:28 -0500)
 
 
 (function() {
@@ -219,7 +219,7 @@ var define, requireModule;
 
   @class Ember
   @static
-  @version 1.0.0-rc4
+  @version 1.0.0-rc.4
 */
 
 if ('undefined' === typeof Ember) {
@@ -246,10 +246,10 @@ Ember.toString = function() { return "Ember"; };
 /**
   @property VERSION
   @type String
-  @default '1.0.0-rc4'
+  @default '1.0.0-rc.4'
   @final
 */
-Ember.VERSION = '1.0.0-rc4';
+Ember.VERSION = '1.0.0-rc.4';
 
 /**
   Standard environmental variables. You can define these in a global `ENV`
@@ -29913,8 +29913,8 @@ helper('wait', wait);
 
 
 })();
-// Version: v1.0.0-rc4
-// Last commit: ae2e55f (2013-05-27 19:34:11 -0400)
+// Version: v1.0.0-rc.4
+// Last commit: 1acec81 (2013-05-27 20:18:28 -0500)
 
 
 (function() {
