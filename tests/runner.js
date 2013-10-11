@@ -6,8 +6,8 @@ if (window.location.search === "?test") {
     '  <div id="ember-testing"></div>' +
     '</div>' +
     '<link rel="stylesheet" href="tests/runner.css">' +
-    '<link rel="stylesheet" href="tests/vendor/qunit-1.11.0.css">' +
-    '<script src="tests/vendor/qunit-1.11.0.js"></script>' +
+    '<link rel="stylesheet" href="tests/vendor/qunit-1.12.0.css">' +
+    '<script src="tests/vendor/qunit-1.12.0.js"></script>' +
     '<script src="tests/tests.js"></script>'
   )
 }
