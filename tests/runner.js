@@ -1,4 +1,4 @@
-if (window.location.search === "?test") {
+if (window.location.search.indexOf("?test") !== -1) {
   document.write(
     '<div id="qunit"></div>' +
     '<div id="qunit-fixture"></div>' +
