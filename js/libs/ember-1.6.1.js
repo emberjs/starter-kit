@@ -5,7 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   1.6.0
+ * @version   1.6.1
  */
 
 
@@ -2518,7 +2518,7 @@ define("ember-metal/core",
 
       @class Ember
       @static
-      @version 1.6.0
+      @version 1.6.1
     */
 
     if ('undefined' === typeof Ember) {
@@ -2545,10 +2545,10 @@ define("ember-metal/core",
     /**
       @property VERSION
       @type String
-      @default '1.6.0'
+      @default '1.6.1'
       @static
     */
-    Ember.VERSION = '1.6.0';
+    Ember.VERSION = '1.6.1';
 
     /**
       Standard environmental variables. You can define these in a global `EmberENV`
@@ -39379,7 +39379,7 @@ define("ember-routing/system/router",
           } else if (error.name === 'TransitionAborted') {
             // just ignore TransitionAborted here
           } else {
-            throw error;
+            logError(error);
           }
 
           return error;
@@ -39522,16 +39522,7 @@ define("ember-routing/system/router",
           return;
         }
 
-        var errorArgs = ['Error while processing route: ' + transition.targetName];
-
-        if (error) {
-          if (error.message) { errorArgs.push(error.message); }
-          if (error.stack)   { errorArgs.push(error.stack); }
-
-          if (typeof error === "string") { errorArgs.push(error); }
-        }
-
-        Ember.Logger.error.apply(this, errorArgs);
+        logError(error, 'Error while processing route: ' + transition.targetName);
       },
 
       loading: function(transition, originRoute) {
@@ -39561,6 +39552,21 @@ define("ember-routing/system/router",
         }
       }
     };
+
+    function logError(error, initialMessage) {
+      var errorArgs = [];
+
+      if (initialMessage) { errorArgs.push(initialMessage); }
+
+      if (error) {
+        if (error.message) { errorArgs.push(error.message); }
+        if (error.stack)   { errorArgs.push(error.stack); }
+
+        if (typeof error === "string") { errorArgs.push(error); }
+      }
+
+      Ember.Logger.error.apply(this, errorArgs);
+    }
 
     function findChildRouteName(parentRoute, originatingChildRoute, name) {
       var router = parentRoute.router,
