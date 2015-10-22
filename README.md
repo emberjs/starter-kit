@@ -1,6 +1,9 @@
 starter-kit
 ===========
 
+## Warning
+### For almost all use cases, you should use [https://ember-cli.com](ember-cli) to create your ember application. Ember starter kit is no longer recommended for new projects and you will find that you are limited in what you can do compared to ember-cli, and documentation will be misleading due to the different style of app construction in ember-cli.
+
 A starter kit for Ember
 
 Your Ember.js project is almost ready! Here's how to get started:
