@@ -2,7 +2,7 @@ starter-kit
 ===========
 
 ## Warning
-### For almost all use cases, you should use [https://ember-cli.com](ember-cli) to create your ember application. Ember starter kit is no longer recommended for new projects and you will find that you are limited in what you can do compared to ember-cli, and documentation will be misleading due to the different style of app construction in ember-cli.
+### For almost all use cases, you should use [https://ember-cli.com](http://ember-cli.com) to create your ember application. Ember starter kit is no longer recommended for new projects and you will find that you are limited in what you can do compared to ember-cli, and documentation will be misleading due to the different style of app construction in ember-cli.
 
 A starter kit for Ember
 
@@ -22,11 +22,11 @@ Your Ember.js project is almost ready! Here's how to get started:
 Tests
 =====
 
-This starter kit comes with an integration test sample, written for QUnit runner. 
+This starter kit comes with an integration test sample, written for QUnit runner.
 
 You can run the tests by opening the `index.html?test` page in your browser.
 
-The test is located in the `tests/tests.js` file. You can see how such an 
+The test is located in the `tests/tests.js` file. You can see how such an
 integration test should be written, using QUnit assertions and ember-testing helpers.
 
 For more information about ember-testing package see [ember-testing](http://emberjs.com/guides/testing/integration/).
